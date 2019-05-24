@@ -1,0 +1,47 @@
+<div class="container">
+  <header>Header</header>
+  <nav>
+    Left menu
+  </nav>
+  <main>
+    <div class="drop-container" (drop)="onDrop($event)" (dragover)="dragOver($event)">
+      <p>Drag and Drop your files here</p>
+    </div>
+
+    <div class="file-area">
+      <p>
+        List of Files
+      </p>
+      <div class="file-list-container" [contextMenu]="basicMenu">
+        <ng-container *ngFor="let file of showList; index as i">
+          <div *ngIf="file.type=='folder'" class="folder" (click)="selectDirectory(file)">
+            <p>{{file.name}}</p>
+          </div>
+          <div *ngIf="file.type=='file'" class="file-list" >
+              <p>{{file.name}}</p>
+            </div>
+        </ng-container>
+
+        <!-- <div class="folder">
+          <p>Folder1</p>
+        </div> -->
+        <!-- <div class="file-list" *ngFor="let file of fileList; index as i">
+          <p>{{file}}</p>
+        </div> -->
+
+        <context-menu>
+          <ng-template contextMenuItem (execute)="showMessage()">
+            New Folder
+          </ng-template>
+          <ng-template contextMenuItem (execute)="showMessage('Hi, ' + $event.item.name)">
+            Action A
+          </ng-template>
+          <ng-template contextMenuItem (execute)="showMessage('Hi, ' + $event.item.name)">
+            Action B
+          </ng-template>
+        </context-menu>
+      </div>
+    </div>
+  </main>
+  <footer>footer</footer>
+</div>
