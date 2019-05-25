@@ -12,6 +12,9 @@ export class AppComponent implements OnInit {
   title = 'app';
   fileList = [];
   showList = [];
+  selectedFolderList = [];
+  folders1 = [];
+  uniqueId = 0;
   folders = [
     {
       name: 'folder1',
@@ -64,10 +67,15 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     console.log('B ngOnInit');
-    this.showList = this.folders;
+    // this.showList = this.folders;
   }
   selectDirectory(file) {
-    this.showList = file.files;
+    if (file.type === 'folder') {
+      if (this.selectedFolderList.indexOf(file.name) === -1) {
+        this.selectedFolderList.push(file.name);
+      }
+      this.showList = file.files;
+    }
   }
   onDrop(event) {
     event.preventDefault();
@@ -82,6 +90,7 @@ export class AppComponent implements OnInit {
           console.log('... file[' + i + '].name = ' + file.name);
           fd.append(file.name, file);
           this.fileList.push(event.dataTransfer.files[i].name);
+          this.showList.push({ name: event.dataTransfer.files[i].name, type: 'file', id: this.uniqueId++ });
         }
       }
       console.log(fd);
@@ -117,8 +126,14 @@ export class AppComponent implements OnInit {
   onContextMenuAction2(item: any) {
     alert(`Click on Action 2 for ${item.name}`);
   }
+  backToPrev() {
+    this.selectedFolderList = [];
+    this.showList = this.folders1;
+  }
 
-  showMessage() {
-
+  addFolder() {
+    const id = this.uniqueId++;
+    this.folders1.push({ name: 'new folder' + id, type: 'folder', id, files: [] });
+    this.showList = this.folders1;
   }
 }

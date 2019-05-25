@@ -58,10 +58,9 @@ footer {
   padding: 5px;
   display: grid;
   background-color: white !important;
-  cursor: pointer;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 100px 100px 100px 100px;
-  grid-gap: 15px;
+  grid-template-rows: 120px 120px 120px 120px;
+  grid-gap: 10px;
 }
 .file-list {
   background-color: white !important;
@@ -69,6 +68,7 @@ footer {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  cursor: pointer;
 }
 .folder {
   width: 150px;
@@ -79,6 +79,7 @@ footer {
   background-color: #ffb500;
   border-radius: 0 6px 6px 6px;
   box-shadow: #ffb500;
+  cursor: pointer;
   display: flex;
   align-items: flex-end;
   justify-content: center;
