@@ -137,3 +137,10 @@ export class AppComponent implements OnInit {
     this.showList = this.folders1;
   }
 }
+/* var dirReader= event.dataTransfer.items[0].webkitGetAsEntry().createReader()
+    dirReader.readEntries(function(entries) {
+      for (var i=0; i<entries.length; i++) {
+        console.log(entries)
+      }
+    });
+ */
