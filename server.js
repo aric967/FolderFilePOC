@@ -1,10 +1,11 @@
 const express = require('express')
-const companion = require('../node_modules/@uppy/companion');
+const companion = require('./node_modules/@uppy/companion');
 const bodyParser = require('body-parser')
 const session = require('express-session')
+const path = require('path');
 
 const app = express()
-
+app.use(express.static('dist'));
 app.use(bodyParser.json())
 app.use(session({
   secret: 'some-secret',
@@ -28,8 +29,10 @@ app.use((req, res, next) => {
 
 // Routes
 app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/plain')
-  res.send('Welcome to Companion')
+  /* res.setHeader('Content-Type', 'text/plain')
+  res.send('Welcome to Companion') */
+  console.log(path.resolve(__dirname, './dist/index.html'));
+  res.sendFile(path.resolve(__dirname, './dist/index.html'));
 })
 
 // initialize uppy
@@ -39,9 +42,9 @@ const uppyOptions = {
       key: '981023211668-39afjftden4grotulm205emc3ttv0aat.apps.googleusercontent.com',
       secret: 'nsslOVltSlI0FvTvkdH8UiG6'
     },
-    instagram: {
-      key: 'your instagram key',
-      secret: 'your instagram secret'
+    dropbox: {
+      key: 'g64muqlxftj40ja',
+      secret: 'td9i548c4uhr41n'
     }
     // you can also add options for dropbox here
   },
