@@ -5,6 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "server": "node server/index.js",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
@@ -23,10 +24,19 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "@uppy/companion": "^1.2.0",
+    "@uppy/core": "^1.1.0",
+    "@uppy/dashboard": "^1.1.0",
+    "@uppy/dropbox": "^1.1.0",
+    "@uppy/google-drive": "^1.1.0",
+    "body-parser": "^1.19.0",
     "core-js": "^2.4.1",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
     "lodash": "^4.17.11",
     "ngx-contextmenu": "^4.2.0",
     "rxjs": "^5.5.6",
+    "uppy": "^1.2.0",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {

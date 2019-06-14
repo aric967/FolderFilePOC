@@ -1,14 +1,18 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { ContextMenuComponent } from 'ngx-contextmenu';
 import * as _ from 'lodash';
+import * as Uppy from '@uppy/core';
+import * as Dashboard from '@uppy/dashboard';
+import * as GoogleDrive from '@uppy/google-drive';
+import * as Dropbox from '@uppy/dropbox';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit  {
   title = 'app';
   fileList = [];
   showList = [];
@@ -69,6 +73,41 @@ export class AppComponent implements OnInit {
     console.log('B ngOnInit');
     // this.showList = this.folders;
   }
+
+  ngAfterViewInit() {
+    const uppy = Uppy({
+      debug: true,
+      autoProceed: false,
+      /* restrictions: {
+        maxFileSize: 1000000,
+        maxNumberOfFiles: 3,
+        minNumberOfFiles: 2,
+        allowedFileTypes: ['image/*', 'video/*']
+      } */
+    })
+      .use(Dashboard, {
+        trigger: '#uppyModalOpener',
+        // inline: true,
+        // target: '.DashboardContainer',
+        // replaceTargetContent: true,
+        // showProgressDetails: true,
+        // note: 'Images and video only, 2–3 files, up to 1 MB',
+        height: 470,
+        metaFields: [
+          { id: 'name', name: 'Name', placeholder: 'file name' },
+          { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' }
+        ],
+        browserBackButtonClose: true
+      })
+      .use(GoogleDrive, { target: Dashboard, companionUrl: 'http://localhost:8080' })
+      .use(Dropbox, { target: Dashboard, companionUrl: 'http://localhost:8080' });
+
+    uppy.on('complete', result => {
+      console.log('successful files:', result.successful);
+      console.log('failed files:', result.failed);
+    });
+  }
+
   selectDirectory(file) {
     if (file.type === 'folder') {
       if (this.selectedFolderList.indexOf(file.name) === -1) {
