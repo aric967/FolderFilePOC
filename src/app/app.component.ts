@@ -12,7 +12,7 @@ import * as Dropbox from '@uppy/dropbox';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, AfterViewInit  {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'app';
   fileList = [];
   showList = [];
@@ -86,11 +86,12 @@ export class AppComponent implements OnInit, AfterViewInit  {
       } */
     })
       .use(Dashboard, {
-        trigger: '#uppyModalOpener',
-        // inline: true,
+        // trigger: '#uppyModalOpener',
+        target: ".DashboardContainer",
+        inline: true,
         // target: '.DashboardContainer',
-        // replaceTargetContent: true,
-        // showProgressDetails: true,
+        replaceTargetContent: true,
+        showProgressDetails: true,
         // note: 'Images and video only, 2–3 files, up to 1 MB',
         height: 470,
         metaFields: [
@@ -99,8 +100,8 @@ export class AppComponent implements OnInit, AfterViewInit  {
         ],
         browserBackButtonClose: true
       })
-      .use(GoogleDrive, { target: Dashboard, companionUrl: 'http://localhost:8080' })
-      .use(Dropbox, { target: Dashboard, companionUrl: 'http://localhost:8080' });
+      .use(GoogleDrive, { target: Dashboard, companionUrl: window.location.origin })
+      .use(Dropbox, { target: Dashboard, companionUrl: window.location.origin });
 
     uppy.on('complete', result => {
       console.log('successful files:', result.successful);
