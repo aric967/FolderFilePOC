@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "server": "node server.js",
-    "build": "ng build --prod",
+    "build": "ng build --prod & gulp insert",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
