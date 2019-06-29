@@ -31,15 +31,15 @@ footer {
   align-items: center;
 }
 .file-area {
-  /* border: 1px solid blue; */
+   border: 1px solid blue;
   /* background-color: grey !important; */
-  /* height: calc(100% - 102px); */
+  height: calc(100% - 102px);
   overflow: auto;
 }
 .file-list-container {
   padding: 5px;
   display: grid;
-  background-color: white !important;
+  background-color: greenyellow !important;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   /* grid-template-rows: 120px 120px 120px 120px; */
   grid-gap: 10px;

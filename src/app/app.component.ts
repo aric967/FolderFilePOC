@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, Pipe, PipeTransform } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { ContextMenuComponent } from 'ngx-contextmenu';
 import * as _ from 'lodash';
@@ -19,51 +19,45 @@ export class AppComponent implements OnInit, AfterViewInit {
   selectedFolderList = [];
   folders1 = [];
   uniqueId = 0;
-  folders = [
+  folders = [];
+  currentId = 0;
+  /* folders = [
     {
       name: 'folder1',
       id: '1',
+      level: 1,
       type: 'folder',
-      files: [{
-        name: 'micrst.doc',
-        type: 'file',
-        id: '1a',
-      }, {
-        name: 'micrst1.pdf',
-        type: 'file',
-        id: '2a',
-      }, {
-        name: 'micrsts.doc',
-        type: 'file',
-        id: '3a',
-      }, {
-        name: 'micrstsdsdsd.doc',
-        type: 'file',
-        id: '4a',
-      }]
-    }, {
+      childId: ['3', '4']
+    },
+    {
       name: 'folder2',
       type: 'folder',
+      level: 1,
       id: '2',
-      files: [{
-        name: 'juggish.doc',
-        type: 'file',
-        id: '1aasd',
-      }, {
-        name: 'juggishrst1.pdf',
-        type: 'file',
-        id: '23423a',
-      }, {
-        name: 'juggisfsdh.doc',
-        type: 'file',
-        id: '3a43re',
-      }, {
-        name: 'juggissh.doc',
-        type: 'file',
-        id: '4adsfsdfsd',
-      }]
+      childId: ['5']
+    },
+    {
+      name: 'file1',
+      type: 'file',
+      parentId: 1,
+      level: 2,
+      id: '3',
+    },
+    {
+      name: 'file12323',
+      type: 'file',
+      parentId: 1,
+      level: 2,
+      id: '4',
+    },
+    {
+      name: '323',
+      type: 'file',
+      level: 2,
+      parentId: 2,
+      id: '5',
     }
-  ];
+  ]; */
   @ViewChild(MatMenuTrigger)
   contextMenu: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
@@ -71,7 +65,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     console.log('B ngOnInit');
-    // this.showList = this.folders;
+    // this.showList = _.filter(this.folders, { level: this.level });
   }
 
   ngAfterViewInit() {
@@ -87,7 +81,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     })
       .use(Dashboard, {
         // trigger: '#uppyModalOpener',
-        target: ".DashboardContainer",
+        target: '.DashboardContainer',
         inline: true,
         // target: '.DashboardContainer',
         replaceTargetContent: true,
@@ -111,13 +105,85 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   selectDirectory(file) {
     if (file.type === 'folder') {
-      if (this.selectedFolderList.indexOf(file.name) === -1) {
-        this.selectedFolderList.push(file.name);
+      this.selectedFolderList.push(file);
+      this.currentId = file.id;
+      if (file.childId.length === 0) {
+        this.showList = [];
+        file.childId = [];
+      } else {
+        this.showList = [];
+        _.map(file.childId, (item) => {
+          console.log(item);
+          const obj = _.find(this.folders, { id: item });
+          console.log(obj);
+          this.showList.push(obj);
+        });
       }
-      this.showList = file.files;
     }
   }
+
+  recursiveFile(dir, parentId) {
+    if (dir.isDirectory) {
+      const dirReader = dir.createReader();
+      console.log(dirReader);
+      this.fileList.push(dir.name);
+      dirReader.readEntries((entries) => {
+        for (let j = 0; j < entries.length; j++) {
+          console.log(entries[j]);
+          const directory = entries[j];
+          if (!directory.isDirectory) {
+            this.fileList.push(directory.name);
+            console.log(directory.name, parentId);
+            const uniqueIdChild = this.uniqueId++;
+            this.folders.push({ name: directory.name, type: 'file', id: uniqueIdChild, parentId: parentId, childId: [] });
+            const parentChildId = _.find(this.folders, { id: parentId });
+            parentChildId.childId.push(uniqueIdChild);
+          } else {
+            console.log(directory);
+            const uniqueId = this.uniqueId++;
+            console.log(directory.name, uniqueId);
+            this.folders.push({ name: directory.name, type: 'folder', id: uniqueId, parentId: parentId, childId: [] });
+            const folderParentChildId = _.find(this.folders, { id: parentId });
+            folderParentChildId.childId.push(uniqueId);
+            this.recursiveFile(directory, uniqueId);
+          }
+        }
+      });
+    } else {
+      console.log(dir);
+    }
+  }
+
   onDrop(event) {
+    event.preventDefault();
+    if (event.dataTransfer.items) {
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const dir = event.dataTransfer.items[i].webkitGetAsEntry();
+        if (dir.isDirectory) {
+          const uniqueId = this.uniqueId++;
+          console.log(dir.name, uniqueId);
+          this.folders.push({ name: dir.name, type: 'folder', id: uniqueId, parentId: this.currentId, childId: [] });
+          const folderParentChildId = _.find(this.folders, { id: this.currentId });
+          folderParentChildId.childId.push(uniqueId);
+          this.recursiveFile(dir, uniqueId);
+        } else {
+          const file = event.dataTransfer.items[i].getAsFile();
+          console.log(file.name);
+          // fd.append(file.name, file);
+          this.fileList.push(file.name);
+          const uniqueId = this.uniqueId++;
+          this.folders.push({ name: file.name, type: 'file', id: uniqueId, parentId: this.currentId, childId: [] });
+          const parentChildId = _.find(this.folders, { id: this.currentId });
+          parentChildId.childId.push(uniqueId);
+        }
+      }
+      setTimeout(() => {
+        this.showList = _.filter(this.folders, { parentId: this.currentId });
+      }, 2000);
+    }
+    console.log('end');
+  }
+  onDrop1(event) {
     event.preventDefault();
     if (event.dataTransfer.items) {
       // Use DataTransferItemList interface to access the file(s)
@@ -130,7 +196,10 @@ export class AppComponent implements OnInit, AfterViewInit {
           console.log('... file[' + i + '].name = ' + file.name);
           fd.append(file.name, file);
           this.fileList.push(event.dataTransfer.files[i].name);
-          this.showList.push({ name: event.dataTransfer.files[i].name, type: 'file', id: this.uniqueId++ });
+          // this.showList.push({ name: event.dataTransfer.files[i].name, type: 'file', id: this.uniqueId++, parentId: this.currentId });
+          this.folders.push({ name: event.dataTransfer.files[i].name, type: 'file', id: this.uniqueId++, parentId: this.currentId });
+          this.showList = _.filter(this.folders, { parentId: this.currentId });
+
         }
       }
       console.log(fd);
@@ -142,10 +211,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
   }
+
   dragOver(event) {
     console.log('File(s) in drop zone');
     event.preventDefault();
   }
+
   onRightClick() {
     console.log('right click event fired');
     event.preventDefault();
@@ -166,17 +237,52 @@ export class AppComponent implements OnInit, AfterViewInit {
   onContextMenuAction2(item: any) {
     alert(`Click on Action 2 for ${item.name}`);
   }
-  backToPrev() {
-    this.selectedFolderList = [];
-    this.showList = this.folders1;
+
+  backToPrev(index) {
+    if (index === undefined) {
+      this.showList = _.filter(this.folders, { root: true });
+      this.selectedFolderList = [];
+      return;
+    }
+    this.selectedFolderList = _.slice(this.selectedFolderList, 0, index + 1);
+    this.currentId = _.last(this.selectedFolderList).id;
+    const root = this.selectedFolderList.length === 0;
+    if (root) {
+      this.showList = _.filter(this.folders, { root: true });
+    } else {
+      this.showList = _.filter(this.folders, { parentId: this.currentId });
+    }
   }
 
   addFolder() {
     const id = this.uniqueId++;
-    this.folders1.push({ name: 'new folder' + id, type: 'folder', id, files: [] });
-    this.showList = this.folders1;
+    const root = this.selectedFolderList.length === 0;
+    // tslint:disable-next-line:max-line-length
+    this.folders.push(
+      {
+        name: 'new folder' + id,
+        type: 'folder',
+        id: id,
+        parentId: root ? null : this.currentId,
+        childId: [],
+        root
+      }
+    );
+
+    if (!root) {
+      const ids = _.find(this.folders, { id: this.currentId });
+      ids.childId.push(id);
+    }
+
+    if (root) {
+      this.showList = _.filter(this.folders, { root: true });
+    } else {
+      this.showList = _.filter(this.folders, { parentId: this.currentId });
+    }
   }
 }
+
+
 /* var dirReader= event.dataTransfer.items[0].webkitGetAsEntry().createReader()
     dirReader.readEntries(function(entries) {
       for (var i=0; i<entries.length; i++) {
@@ -184,3 +290,11 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     });
  */
+@Pipe({ name: 'exponentialStrength' })
+export class ExponentialStrengthPipe implements PipeTransform {
+  transform(value: number, level?: number): number {
+    console.log(value);
+    console.log(level);
+    return value;
+  }
+}

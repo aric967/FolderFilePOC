@@ -2,6 +2,10 @@
   <header>Header</header>
   <nav>
     Left menu
+    <pre>
+      {{folders | json}}
+      {{fileList | json}}
+    </pre>
   </nav>
   <main>
     <div class="drop-container" (drop)="onDrop($event)" (dragover)="dragOver($event)">
@@ -10,10 +14,11 @@
 
     <div class="file-area">
       <p>
-        <span *ngFor="let list of selectedFolderList" (click)="backToPrev()">{{list}}&nbsp;</span>
+        <span (click)="backToPrev()">root &nbsp;</span>
+        <span *ngFor="let list of selectedFolderList;let i = index" (click)="backToPrev(i)">{{list.name}}  &nbsp;</span>
       </p>
       <div class="file-list-container" [contextMenu]="basicMenu">
-        <ng-container *ngFor="let file of showList; index as i">
+        <ng-container *ngFor="let file of showList">
           <div *ngIf="file.type=='folder'" class="folder" (click)="selectDirectory(file)">
             <p>{{file.name}}</p>
           </div>
@@ -35,9 +40,9 @@
       </div>
     </div>
     <div>
-      <div class="DashboardContainer">
+      <!-- <div class="DashboardContainer">
 
-      </div> 
+      </div>  -->
       <!-- <button id="uppyModalOpener">
         Open Modal
       </button> -->
